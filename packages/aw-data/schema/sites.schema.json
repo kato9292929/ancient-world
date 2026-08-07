@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ancient-world/schema/sites.schema.json",
+  "title": "sites",
+  "type": "array",
+  "items": { "$ref": "#/definitions/site" },
+  "definitions": {
+    "site": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name_ja",
+        "name_en",
+        "cluster",
+        "country",
+        "lat",
+        "lng",
+        "coord_source",
+        "coord_status",
+        "era_start",
+        "era_end",
+        "era_status",
+        "era_note",
+        "attributes",
+        "article_url",
+        "summary"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "スラッグ。例 gobekli-tepe"
+        },
+        "name_ja": { "type": "string", "minLength": 1 },
+        "name_en": { "type": "string", "minLength": 1 },
+        "cluster": {
+          "type": "string",
+          "description": "clusters.json の id",
+          "minLength": 1
+        },
+        "country": { "type": "string", "minLength": 1 },
+        "lat": {
+          "type": ["number", "null"],
+          "minimum": -90,
+          "maximum": 90
+        },
+        "lng": {
+          "type": ["number", "null"],
+          "minimum": -180,
+          "maximum": 180
+        },
+        "coord_source": {
+          "type": ["string", "null"],
+          "enum": ["wikidata", "pleiades", null]
+        },
+        "coord_status": {
+          "type": "string",
+          "enum": ["verified", "unfetched"]
+        },
+        "era_start": {
+          "type": "integer",
+          "description": "負の値が紀元前。例 -9600"
+        },
+        "era_end": { "type": ["integer", "null"] },
+        "era_status": {
+          "type": "string",
+          "enum": ["sourced", "unfetched"]
+        },
+        "era_note": {
+          "type": "string",
+          "description": "年代の但し書き。無ければ空文字列"
+        },
+        "attributes": {
+          "type": "object",
+          "description": "クラスタごとに異なる属性"
+        },
+        "article_url": {
+          "type": ["string", "null"],
+          "format": "uri"
+        },
+        "summary": {
+          "type": "array",
+          "maxItems": 3,
+          "items": { "type": "string", "minLength": 1 },
+          "description": "3要素まで。1要素は1文"
+        }
+      }
+    }
+  }
+}

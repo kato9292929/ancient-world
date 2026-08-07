@@ -1,0 +1,22 @@
+{
+  "name": "ancient-world",
+  "private": true,
+  "version": "0.0.0",
+  "description": "ancient world — 遺跡・出来事のデータと、それを参照する複数のビジュアル。モノレポ。デプロイ単位はパッケージごとに分離できる。",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "validate": "pnpm -r --if-present run validate",
+    "test": "pnpm -r --if-present run test",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "build": "pnpm -r --if-present run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

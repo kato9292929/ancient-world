@@ -1,0 +1,15 @@
+{
+  "head": { "vars": ["place", "coord"] },
+  "results": {
+    "bindings": [
+      {
+        "place": { "type": "uri", "value": "http://www.wikidata.org/entity/Q1026254" },
+        "coord": { "type": "literal", "value": "Point(38.922500 37.223056)" }
+      },
+      {
+        "place": { "type": "uri", "value": "http://www.wikidata.org/entity/Q9999999" },
+        "coord": { "type": "literal", "value": "Point(44.000000 33.000000)" }
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ancient-world/schema/clusters.schema.json",
+  "title": "clusters",
+  "type": "array",
+  "items": { "$ref": "#/definitions/cluster" },
+  "definitions": {
+    "cluster": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name_ja", "name_en"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "スラッグ。sites.json の cluster が参照する"
+        },
+        "name_ja": { "type": "string", "minLength": 1 },
+        "name_en": { "type": "string", "minLength": 1 },
+        "note": { "type": "string" }
+      }
+    }
+  }
+}

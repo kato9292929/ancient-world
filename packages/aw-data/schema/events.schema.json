@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ancient-world/schema/events.schema.json",
+  "title": "events",
+  "type": "array",
+  "items": { "$ref": "#/definitions/event" },
+  "definitions": {
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "description",
+        "era_start",
+        "era_end",
+        "era_status",
+        "era_note",
+        "site_ids",
+        "article_url"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "description": {
+          "type": "string",
+          "description": "1〜2文の説明"
+        },
+        "era_start": {
+          "type": "integer",
+          "description": "負の値が紀元前"
+        },
+        "era_end": { "type": ["integer", "null"] },
+        "era_status": {
+          "type": "string",
+          "enum": ["sourced", "unfetched"]
+        },
+        "era_note": {
+          "type": "string",
+          "description": "年代の但し書き。「頃」「以降」など。無ければ空文字列"
+        },
+        "site_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "description": "関連地点の id 配列。sites.json を参照"
+        },
+        "article_url": {
+          "type": ["string", "null"],
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

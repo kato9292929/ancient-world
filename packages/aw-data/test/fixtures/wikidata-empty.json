@@ -1,0 +1,4 @@
+{
+  "head": { "vars": ["place", "coord"] },
+  "results": { "bindings": [] }
+}
