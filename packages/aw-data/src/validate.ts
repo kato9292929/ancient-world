@@ -83,6 +83,15 @@ export function validateData(data: DataSet, schemas: Schemas): ValidateResult {
         message: `coord_status が "verified" だが lat/lng が null`,
       });
     }
+    // 逆に、確定していない（ambiguous / unfetched）のに座標が入っているのは不整合。
+    // 確定していない座標を地図に出させないため落とす。
+    if (s.coord_status !== "verified" && (s.lat !== null || s.lng !== null)) {
+      errors.push({
+        level: "error",
+        where: at,
+        message: `coord_status が "${s.coord_status}" なのに lat/lng が入っている`,
+      });
+    }
     // verified なのに出所がないのは不整合。警告に留める。
     if (s.coord_status === "verified" && s.coord_source === null) {
       warnings.push({

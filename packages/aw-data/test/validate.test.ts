@@ -62,6 +62,18 @@ describe("validateData", () => {
     expect(errors.some((e) => /coord_status/.test(e.message))).toBe(true);
   });
 
+  it("は ambiguous を許し、座標が null なら通す", () => {
+    const s = baseSite({ coord_status: "ambiguous", coord_source: null, lat: null, lng: null });
+    const { errors } = validateData(dataOf([s]), schemas);
+    expect(errors).toEqual([]);
+  });
+
+  it("は確定していない（ambiguous）のに座標が入っていたら落とす", () => {
+    const s = baseSite({ coord_status: "ambiguous", lat: 46, lng: 30 });
+    const { errors } = validateData(dataOf([s]), schemas);
+    expect(errors.some((e) => /lat\/lng が入っている/.test(e.message))).toBe(true);
+  });
+
   it("は未知の cluster を参照したら落とす", () => {
     const bad = baseSite({ cluster: "no-such-cluster" });
     const { errors } = validateData(dataOf([bad]), schemas);

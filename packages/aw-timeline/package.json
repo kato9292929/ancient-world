@@ -1,0 +1,16 @@
+{
+  "name": "@aw/timeline",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "縦スクロール年表。前1万年から現在までを線形（案A）で縦に貫く。",
+  "scripts": {
+    "build": "tsx scripts/build.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aw/data": "workspace:*"
+  }
+}

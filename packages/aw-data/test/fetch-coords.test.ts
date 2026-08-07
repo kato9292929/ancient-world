@@ -83,4 +83,37 @@ describe("fetchSiteCoord（フィクスチャを注入）", () => {
     expect(r.status).toBe("verified");
     if (r.status === "verified") expect(r.source).toBe("pleiades");
   });
+
+  it("は Pleiades を優先し、両方から取れても ambiguous にしない", async () => {
+    // 源をまたいで連結していたら 2 候補で ambiguous になるが、Pleiades 優先なので verified。
+    const pleiades = parsePleiadesResponse({ id: "912986", reprPoint: [46.0, 30.816667] })!;
+    let wikidataCalled = false;
+    const deps: FetchDeps = {
+      fetchWikidata: async () => {
+        wikidataCalled = true;
+        return parseWikidataResponse(wikidataSingle);
+      },
+      fetchPleiades: async () => [pleiades],
+    };
+    const r = await fetchSiteCoord(site(), deps);
+    expect(r.status).toBe("verified");
+    if (r.status === "verified") expect(r.source).toBe("pleiades");
+    // Pleiades で決まったら Wikidata は見ない。
+    expect(wikidataCalled).toBe(false);
+  });
+
+  it("は Pleiades が空のときだけ Wikidata を見る", async () => {
+    let wikidataCalled = false;
+    const deps: FetchDeps = {
+      fetchWikidata: async () => {
+        wikidataCalled = true;
+        return parseWikidataResponse(wikidataSingle);
+      },
+      fetchPleiades: async () => [],
+    };
+    const r = await fetchSiteCoord(site(), deps);
+    expect(wikidataCalled).toBe(true);
+    expect(r.status).toBe("verified");
+    if (r.status === "verified") expect(r.source).toBe("wikidata");
+  });
 });

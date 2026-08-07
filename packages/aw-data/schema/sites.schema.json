@@ -56,7 +56,8 @@
         },
         "coord_status": {
           "type": "string",
-          "enum": ["verified", "unfetched"]
+          "enum": ["verified", "ambiguous", "unfetched"],
+          "description": "verified=座標確定。ambiguous=複数候補で未確定（人手で選ぶ）。unfetched=未取得"
         },
         "era_start": {
           "type": "integer",

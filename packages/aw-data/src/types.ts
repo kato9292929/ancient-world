@@ -1,6 +1,8 @@
 // aw-data の型。sites.json / events.json / clusters.json のスキーマに対応する。
 
-export type CoordStatus = "verified" | "unfetched";
+// verified=座標確定。ambiguous=複数候補が返り未確定（人手で選ぶ）。unfetched=未取得。
+// unfetched と ambiguous を区別する：手つかずの地点と、候補は出たが確定していない地点を混ぜない。
+export type CoordStatus = "verified" | "ambiguous" | "unfetched";
 export type CoordSource = "wikidata" | "pleiades" | null;
 export type EraStatus = "sourced" | "unfetched";
 

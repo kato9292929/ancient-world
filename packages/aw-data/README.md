@@ -63,13 +63,29 @@ pnpm --filter @aw/data fetch-coords -- --dry-run  # 書き換えず結果だけ�
 
 - Wikidata の SPARQL エンドポイントと Pleiades の JSON API を叩く
 - 引くのは緯度経度と、参照した識別子（Q コードまたは Pleiades ID）
+- **取得元の優先順位は Pleiades → Wikidata。** 近東・地中海は Pleiades の精度が高く、日本の
+  遺跡は Wikidata にしかない、という題材の実態に合わせる。源をまたいで候補を単純連結すると、
+  両方から 1 件ずつ返っただけで「複数候補」に化けるため、源ごとに解決する。Pleiades が 1 件でも
+  返せばそれで確定し、Wikidata は見ない。Pleiades が空のときだけ Wikidata に問い合わせる
 - **取得できた地点だけ** `coord_status` を `"verified"` に更新し、`lat` / `lng` / `coord_source` を埋める
+- **複数候補が返った場合は自動選択しない。** 候補を標準出力に列挙し、`coord_status` を
+  `"ambiguous"` にして残す（座標は入れない）。手つかずの `"unfetched"` と区別できる
 - **取得できなかった地点は `"unfetched"` のまま残す。** 近隣の値や中心座標では埋めない
-- **複数候補が返った場合は自動選択しない。** 候補を標準出力に列挙して当該地点はスキップ（`unfetched` のまま）
 - 取得失敗（HTTP エラーなど）は握りつぶさず、件数と地点 id を標準エラーに出して非ゼロ終了
 
 参照した識別子（Q コード等）は出所として標準出力に残す。`sites.json` のスキーマには識別子の
 フィールドを持たせていない（スキーマ確定のため）。
+
+### coord_status の 3 状態
+
+| 状態 | 意味 | 座標 | 地図（aw-map）での扱い |
+|---|---|---|---|
+| `verified` | 座標確定 | あり | ピンを出す |
+| `ambiguous` | 複数候補が返り未確定（人手で選ぶ） | null | 一覧に「候補が複数」として出す。件数は別に数える |
+| `unfetched` | 未取得（手つかず） | null | 一覧に「座標未取得」として出す |
+
+`ambiguous` は指示書には無かった状態だが、「候補は出たが確定していない地点」と「手つかずの
+地点」を混ぜないために足した。地図側はこの 3 状態で分岐する。
 
 ### 実行後に何が変わるか
 
@@ -86,6 +102,7 @@ pnpm --filter @aw/data validate
 
 - スキーマ違反で落とす
 - `coord_status: "verified"` なのに `lat` / `lng` が null の行があれば落とす
+- 逆に、`verified` 以外（`ambiguous` / `unfetched`）なのに座標が入っている行も落とす（未確定の座標を地図に出させない）
 - 参照整合：`sites.cluster` が `clusters.json` に無い、`events.site_ids` が `sites.json` に無い場合は落とす
 - id の重複で落とす
 - `era_start` が正（紀元後）なのに `era_note` が空なら警告（落とさない）

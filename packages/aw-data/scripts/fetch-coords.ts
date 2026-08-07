@@ -42,13 +42,18 @@ export interface FetchDeps {
 
 /**
  * 1 地点分の解決。ネットワークは deps に注入する（テストではフィクスチャを注入する）。
- * Wikidata と Pleiades の候補を合わせて resolveCoord に渡す。
+ *
+ * 取得元の優先順位は Pleiades → Wikidata。近東・地中海の遺跡は Pleiades の精度が高く、
+ * 日本の遺跡は Wikidata にしかない、という題材の実態に合わせる。源をまたいで候補を単純に
+ * 連結すると、両方から 1 件ずつ返っただけで「複数候補（ambiguous）」に化けてしまうため、
+ * 源ごとに解決する。Pleiades が 1 件でも返せばそれで確定し、Wikidata は見ない。Pleiades が
+ * 何も返さないときだけ Wikidata に問い合わせる。
  */
 export async function fetchSiteCoord(site: Site, deps: FetchDeps): Promise<CoordResolution> {
-  const candidates: CoordCandidate[] = [];
-  candidates.push(...(await deps.fetchWikidata(site)));
-  candidates.push(...(await deps.fetchPleiades(site)));
-  return resolveCoord(candidates);
+  const pleiades = await deps.fetchPleiades(site);
+  if (pleiades.length > 0) return resolveCoord(pleiades);
+  const wikidata = await deps.fetchWikidata(site);
+  return resolveCoord(wikidata);
 }
 
 // ---- ここから下は実ネットワーク実装。サンドボックスでは動かない。----
@@ -85,6 +90,7 @@ async function main(): Promise<void> {
   const sites = JSON.parse(readFileSync(sitesPath, "utf8")) as Site[];
 
   let updated = 0;
+  let changed = false;
   const ambiguous: string[] = [];
   const failed: string[] = [];
   let stillUnfetched = 0;
@@ -108,25 +114,31 @@ async function main(): Promise<void> {
       site.coord_source = resolution.source;
       site.coord_status = "verified";
       updated += 1;
+      changed = true;
       // 参照した識別子は出所として stdout に残す（sites.json のスキーマには持たせない）。
       process.stdout.write(
         `  verified: ${site.id} <- ${resolution.identifier} (${resolution.lat}, ${resolution.lng})\n`,
       );
     } else if (resolution.status === "ambiguous") {
-      // 自動選択しない。候補を出して当該地点はスキップ。unfetched のまま残す。
+      // 自動選択しない。候補を出して、状態は "ambiguous" として残す（座標は入れない）。
+      // これで unfetched（手つかず）と区別でき、地図側で別ラベル・別件数にできる。
+      if (site.coord_status !== "ambiguous") changed = true;
+      site.coord_status = "ambiguous";
+      site.lat = null;
+      site.lng = null;
+      site.coord_source = null;
       ambiguous.push(site.id);
       process.stdout.write(`  ambiguous: ${site.id} — ${resolution.candidates.length} candidates:\n`);
       for (const c of resolution.candidates) {
         process.stdout.write(`      ${c.identifier}  (${c.lat}, ${c.lng})  [${c.source}]\n`);
       }
-      stillUnfetched += 1;
     } else {
       // no-result。近隣や中心で埋めない。unfetched のまま。
       stillUnfetched += 1;
     }
   }
 
-  if (updated > 0 && !dryRun) {
+  if (changed && !dryRun) {
     writeFileSync(sitesPath, JSON.stringify(sites, null, 2) + "\n", "utf8");
   }
 

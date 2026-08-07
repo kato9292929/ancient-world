@@ -30,6 +30,12 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1(ajv@8.20.0)
 
+  packages/aw-timeline:
+    dependencies:
+      '@aw/data':
+        specifier: workspace:*
+        version: link:../aw-data
+
 packages:
 
   '@esbuild/aix-ppc64@0.21.5':
