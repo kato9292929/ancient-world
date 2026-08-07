@@ -20,6 +20,7 @@ function baseSite(overrides: Record<string, unknown> = {}) {
     lat: null,
     lng: null,
     coord_source: null,
+    coord_ref: null,
     coord_status: "unfetched",
     era_start: -5400,
     era_end: null,
@@ -72,6 +73,45 @@ describe("validateData", () => {
     const s = baseSite({ coord_status: "ambiguous", lat: 46, lng: 30 });
     const { errors } = validateData(dataOf([s]), schemas);
     expect(errors.some((e) => /lat\/lng が入っている/.test(e.message))).toBe(true);
+  });
+
+  it("は unlocated を許す（所在未特定・座標も出所も無い）", () => {
+    const s = baseSite({ coord_status: "unlocated", coord_source: null, coord_ref: null, lat: null, lng: null });
+    const { errors } = validateData(dataOf([s]), schemas);
+    expect(errors).toEqual([]);
+  });
+
+  it("は unlocated なのに座標が入っていたら落とす", () => {
+    const s = baseSite({ coord_status: "unlocated", lat: 44, lng: 33 });
+    const { errors } = validateData(dataOf([s]), schemas);
+    expect(errors.some((e) => /lat\/lng が入っている/.test(e.message))).toBe(true);
+  });
+
+  it("は coord_source が other なら coord_ref（出所）を必須にする", () => {
+    const withRef = baseSite({
+      coord_status: "verified",
+      coord_source: "other",
+      coord_ref: "国土地理院 地形図 5万分の1「阿蘇」",
+      lat: 33.0,
+      lng: 131.0,
+    });
+    expect(validateData(dataOf([withRef]), schemas).errors).toEqual([]);
+
+    const noRef = baseSite({
+      coord_status: "verified",
+      coord_source: "other",
+      coord_ref: "",
+      lat: 33.0,
+      lng: 131.0,
+    });
+    const { errors } = validateData(dataOf([noRef]), schemas);
+    expect(errors.some((e) => /coord_ref/.test(e.message))).toBe(true);
+  });
+
+  it("は verified なのに coord_source が null なら落とす（出所必須）", () => {
+    const s = baseSite({ coord_status: "verified", coord_source: null, coord_ref: null, lat: 46, lng: 30 });
+    const { errors } = validateData(dataOf([s]), schemas);
+    expect(errors.some((e) => /coord_source が null/.test(e.message))).toBe(true);
   });
 
   it("は未知の cluster を参照したら落とす", () => {

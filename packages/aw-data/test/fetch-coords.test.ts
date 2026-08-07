@@ -16,6 +16,7 @@ function site(overrides: Partial<Site> = {}): Site {
     lat: null,
     lng: null,
     coord_source: null,
+    coord_ref: null,
     coord_status: "unfetched",
     era_start: -9000,
     era_end: null,

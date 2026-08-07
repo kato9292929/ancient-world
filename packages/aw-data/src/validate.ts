@@ -83,7 +83,7 @@ export function validateData(data: DataSet, schemas: Schemas): ValidateResult {
         message: `coord_status が "verified" だが lat/lng が null`,
       });
     }
-    // 逆に、確定していない（ambiguous / unfetched）のに座標が入っているのは不整合。
+    // 逆に、確定していない（ambiguous / unlocated / unfetched）のに座標が入っているのは不整合。
     // 確定していない座標を地図に出させないため落とす。
     if (s.coord_status !== "verified" && (s.lat !== null || s.lng !== null)) {
       errors.push({
@@ -92,12 +92,29 @@ export function validateData(data: DataSet, schemas: Schemas): ValidateResult {
         message: `coord_status が "${s.coord_status}" なのに lat/lng が入っている`,
       });
     }
-    // verified なのに出所がないのは不整合。警告に留める。
+    // verified なのに出所がないのは落とす。「出所が書けないものは入れない」を担保する。
     if (s.coord_status === "verified" && s.coord_source === null) {
+      errors.push({
+        level: "error",
+        where: at,
+        message: `coord_status が "verified" だが coord_source が null（出所を必須にする）`,
+      });
+    }
+    // coord_source が "other"（Wikidata/Pleiades 以外）なら、出所の URL か文書名を必ず持たせる。
+    // これで推測での埋めを防ぎつつ、第3の出所からの座標を受け入れられる。
+    if (s.coord_source === "other" && (s.coord_ref === null || s.coord_ref.trim() === "")) {
+      errors.push({
+        level: "error",
+        where: at,
+        message: `coord_source が "other" なのに coord_ref（出所URL・文書名）が空`,
+      });
+    }
+    // unlocated は所在未特定。取得しても埋まらないので座標も出所も持たない前提。
+    if (s.coord_status === "unlocated" && s.coord_source !== null) {
       warnings.push({
         level: "warning",
         where: at,
-        message: `coord_status が "verified" だが coord_source が null`,
+        message: `coord_status が "unlocated" なのに coord_source が入っている`,
       });
     }
     // 参照整合。cluster が clusters.json に無ければ落とす。

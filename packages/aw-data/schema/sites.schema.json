@@ -17,6 +17,7 @@
         "lat",
         "lng",
         "coord_source",
+        "coord_ref",
         "coord_status",
         "era_start",
         "era_end",
@@ -52,12 +53,17 @@
         },
         "coord_source": {
           "type": ["string", "null"],
-          "enum": ["wikidata", "pleiades", null]
+          "enum": ["wikidata", "pleiades", "other", null],
+          "description": "wikidata / pleiades / other（行政資料・地理院など。coord_ref 必須） / null"
+        },
+        "coord_ref": {
+          "type": ["string", "null"],
+          "description": "出所の識別子または文書名。wikidata=Qコード、pleiades=ID、other=出所URLか文書名（必須）。null は未取得"
         },
         "coord_status": {
           "type": "string",
-          "enum": ["verified", "ambiguous", "unfetched"],
-          "description": "verified=座標確定。ambiguous=複数候補で未確定（人手で選ぶ）。unfetched=未取得"
+          "enum": ["verified", "ambiguous", "unlocated", "unfetched"],
+          "description": "verified=座標確定。ambiguous=複数候補で未確定（人手で選ぶ）。unlocated=所在が特定されていない（取得対象外）。unfetched=まだ取得していない"
         },
         "era_start": {
           "type": "integer",

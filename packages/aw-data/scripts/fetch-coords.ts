@@ -96,7 +96,9 @@ async function main(): Promise<void> {
   let stillUnfetched = 0;
 
   for (const site of sites) {
-    if (site.coord_status === "verified") continue;
+    // 確定済み（verified）と、所在未特定（unlocated）は取得対象外。unlocated は取得しても
+    // 埋まらないので、何度実行しても未取得件数に混ぜない。
+    if (site.coord_status === "verified" || site.coord_status === "unlocated") continue;
 
     let resolution: CoordResolution;
     try {
@@ -112,10 +114,10 @@ async function main(): Promise<void> {
       site.lat = resolution.lat;
       site.lng = resolution.lng;
       site.coord_source = resolution.source;
+      site.coord_ref = resolution.identifier;
       site.coord_status = "verified";
       updated += 1;
       changed = true;
-      // 参照した識別子は出所として stdout に残す（sites.json のスキーマには持たせない）。
       process.stdout.write(
         `  verified: ${site.id} <- ${resolution.identifier} (${resolution.lat}, ${resolution.lng})\n`,
       );
@@ -127,6 +129,7 @@ async function main(): Promise<void> {
       site.lat = null;
       site.lng = null;
       site.coord_source = null;
+      site.coord_ref = null;
       ambiguous.push(site.id);
       process.stdout.write(`  ambiguous: ${site.id} — ${resolution.candidates.length} candidates:\n`);
       for (const c of resolution.candidates) {

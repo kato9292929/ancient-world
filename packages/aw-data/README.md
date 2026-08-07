@@ -44,7 +44,9 @@ import { sites, events, clusters, type Site } from "@aw/data";
 初期データ（別紙の素材台帳の全件）を投入する際のルール:
 
 - 名称・クラスタ・国は台帳の記載どおり
-- 座標は全件 `lat: null, lng: null, coord_source: null, coord_status: "unfetched"`
+- 座標は原則 `lat: null, lng: null, coord_source: null, coord_ref: null, coord_status: "unfetched"`
+- ただし**所在が特定されていない地点（ララク、アッカドなど）は `coord_status: "unlocated"`**。取得しても
+  埋まらないので、未取得（`unfetched`）とは分ける
 - 年代は台帳に記載のあるものだけ入れて `era_status: "sourced"`。記載のないものは `null` と `"unfetched"`
 - `summary` は空配列（記事側の作業）
 - 台帳にない地点・年代を足さない／推測で埋めない
@@ -76,16 +78,37 @@ pnpm --filter @aw/data fetch-coords -- --dry-run  # 書き換えず結果だけ�
 参照した識別子（Q コード等）は出所として標準出力に残す。`sites.json` のスキーマには識別子の
 フィールドを持たせていない（スキーマ確定のため）。
 
-### coord_status の 3 状態
+### coord_status の 4 状態
 
-| 状態 | 意味 | 座標 | 地図（aw-map）での扱い |
-|---|---|---|---|
-| `verified` | 座標確定 | あり | ピンを出す |
-| `ambiguous` | 複数候補が返り未確定（人手で選ぶ） | null | 一覧に「候補が複数」として出す。件数は別に数える |
-| `unfetched` | 未取得（手つかず） | null | 一覧に「座標未取得」として出す |
+| 状態 | 意味 | 座標 | fetch の対象 | 地図（aw-map）での扱い |
+|---|---|---|---|---|
+| `verified` | 座標確定 | あり | — | ピンを出す |
+| `ambiguous` | 複数候補が返り未確定（人手で選ぶ） | null | 対象（再評価で候補を出す） | 一覧に「候補が複数」。件数は別に数える |
+| `unlocated` | 所在がそもそも特定されていない | null | **対象外** | 一覧に「所在未特定」。**未取得件数に数えない** |
+| `unfetched` | まだ取得していない（手つかず） | null | 対象 | 一覧に「座標未取得」 |
 
-`ambiguous` は指示書には無かった状態だが、「候補は出たが確定していない地点」と「手つかずの
-地点」を混ぜないために足した。地図側はこの 3 状態で分岐する。
+`ambiguous` と `unlocated` はどちらも指示書には無かった状態だが、`flood_layer` の `absent` /
+`unknown` を分けたのと同じ区別。
+
+- `ambiguous`：候補は出たが確定していない地点。手つかず（`unfetched`）と混ぜない。
+- `unlocated`：比定地が確定していない地点（例：ララク、アッカド）。取得しても埋まらないので、
+  何度 `fetch-coords` を実行しても未取得件数が減らない、という不整合を避けるため取得対象外にする。
+
+地図側はこの 4 状態で分岐する。
+
+### coord_source と coord_ref（出所）
+
+| coord_source | 用途 | coord_ref |
+|---|---|---|
+| `wikidata` | Wikidata から取得 | Q コード（fetch が埋める） |
+| `pleiades` | Pleiades から取得 | `pleiades:<id>`（fetch が埋める） |
+| `other` | Wikidata・Pleiades 以外（行政資料・地理院など） | **出所の URL か文書名を必須**（人手で入れる） |
+| `null` | 未取得 | null |
+
+`other` は、日本の遺跡など Wikidata・Pleiades に座標が無い地点のための逃げ道。例えば押戸石の丘は
+国指定史跡ではなく町の名勝指定で、Wikidata に座標が無い可能性がある。行政の公開資料や国土地理院の
+情報から座標が取れたとき、それを入れる先が無いと手詰まりになる。`other` + `coord_ref`（出所）で
+受け入れる。**出所が書けないものは入れられない**という条件は同じなので、「推測で埋めない」は保たれる。
 
 ### 実行後に何が変わるか
 
@@ -102,7 +125,9 @@ pnpm --filter @aw/data validate
 
 - スキーマ違反で落とす
 - `coord_status: "verified"` なのに `lat` / `lng` が null の行があれば落とす
-- 逆に、`verified` 以外（`ambiguous` / `unfetched`）なのに座標が入っている行も落とす（未確定の座標を地図に出させない）
+- 逆に、`verified` 以外（`ambiguous` / `unlocated` / `unfetched`）なのに座標が入っている行も落とす（未確定の座標を地図に出させない）
+- `coord_status: "verified"` なのに `coord_source` が null なら落とす（出所必須）
+- `coord_source: "other"` なのに `coord_ref`（出所 URL・文書名）が空なら落とす
 - 参照整合：`sites.cluster` が `clusters.json` に無い、`events.site_ids` が `sites.json` に無い場合は落とす
 - id の重複で落とす
 - `era_start` が正（紀元後）なのに `era_note` が空なら警告（落とさない）
@@ -128,8 +153,9 @@ pnpm --filter @aw/data test
 | `cluster` | string | `clusters.json` の id |
 | `country` | string | 国名 |
 | `lat` / `lng` | number \| null | 座標。未取得は null |
-| `coord_source` | `"wikidata"` \| `"pleiades"` \| null | 出所 |
-| `coord_status` | `"verified"` \| `"unfetched"` | 取得状態 |
+| `coord_source` | `"wikidata"` \| `"pleiades"` \| `"other"` \| null | 出所。`other` は行政資料・地理院など |
+| `coord_ref` | string \| null | 出所の識別子・文書名。`other` は必須 |
+| `coord_status` | `"verified"` \| `"ambiguous"` \| `"unlocated"` \| `"unfetched"` | 取得状態 |
 | `era_start` | integer | 負が紀元前。例 `-9600` |
 | `era_end` | integer \| null | |
 | `era_status` | `"sourced"` \| `"unfetched"` | |
