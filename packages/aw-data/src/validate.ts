@@ -133,6 +133,34 @@ export function validateData(data: DataSet, schemas: Schemas): ValidateResult {
         message: `era_start が正（紀元後 ${s.era_start}）だが era_note が空`,
       });
     }
+
+    // era_note は年代の但し書き専用。unfetched は持たない／sourced は持つ、を不変条件にする。
+    const hasEraNote = s.era_note.trim() !== "";
+    if (s.era_status === "unfetched" && hasEraNote) {
+      errors.push({
+        level: "error",
+        where: at,
+        message: `era_status が "unfetched" なのに era_note がある（note へ移す）`,
+      });
+    }
+    if (s.era_status === "sourced" && !hasEraNote) {
+      warnings.push({
+        level: "warning",
+        where: at,
+        message: `era_status が "sourced" だが era_note が空`,
+      });
+    }
+
+    // flood_layer が unknown なら layer_note を持たない（洪水層と無関係の注記は note へ）。
+    const attrs = s.attributes as Record<string, unknown>;
+    const layerNote = typeof attrs["layer_note"] === "string" ? (attrs["layer_note"] as string) : "";
+    if (attrs["flood_layer"] === "unknown" && layerNote.trim() !== "") {
+      errors.push({
+        level: "error",
+        where: at,
+        message: `flood_layer が "unknown" なのに layer_note がある（note へ移す）`,
+      });
+    }
   }
 
   for (const e of events) {

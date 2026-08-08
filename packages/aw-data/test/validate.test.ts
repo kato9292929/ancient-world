@@ -26,6 +26,7 @@ function baseSite(overrides: Record<string, unknown> = {}) {
     era_end: null,
     era_status: "sourced",
     era_note: "最古の層",
+    note: null,
     attributes: { flood_layer: "absent", layer_period: null, layer_note: null },
     article_url: null,
     summary: [],
@@ -112,6 +113,36 @@ describe("validateData", () => {
     const s = baseSite({ coord_status: "verified", coord_source: null, coord_ref: null, lat: 46, lng: 30 });
     const { errors } = validateData(dataOf([s]), schemas);
     expect(errors.some((e) => /coord_source が null/.test(e.message))).toBe(true);
+  });
+
+  it("は era_status unfetched なのに era_note があれば落とす", () => {
+    const s = baseSite({ era_status: "unfetched", era_start: null, era_note: "ネイト神殿" });
+    const { errors } = validateData(dataOf([s]), schemas);
+    expect(errors.some((e) => /unfetched.*era_note/.test(e.message))).toBe(true);
+  });
+
+  it("は era_status sourced なのに era_note が空なら警告", () => {
+    const s = baseSite({ era_status: "sourced", era_start: -100, era_note: "" });
+    const { errors, warnings } = validateData(dataOf([s]), schemas);
+    expect(errors).toEqual([]);
+    expect(warnings.some((w) => /era_note が空/.test(w.message))).toBe(true);
+  });
+
+  it("は flood_layer unknown なのに layer_note があれば落とす", () => {
+    const s = baseSite({
+      era_status: "unfetched",
+      era_start: null,
+      era_note: "",
+      attributes: { flood_layer: "unknown", layer_period: null, layer_note: "洪水前・第2" },
+    });
+    const { errors } = validateData(dataOf([s]), schemas);
+    expect(errors.some((e) => /flood_layer.*unknown.*layer_note/.test(e.message))).toBe(true);
+  });
+
+  it("は note を任意フィールドとして許す", () => {
+    const s = baseSite({ era_status: "unfetched", era_start: null, era_note: "", note: "ネイト神殿" });
+    const { errors } = validateData(dataOf([s]), schemas);
+    expect(errors).toEqual([]);
   });
 
   it("は未知の cluster を参照したら落とす", () => {

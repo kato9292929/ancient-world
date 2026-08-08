@@ -20,6 +20,7 @@ function site(overrides: Partial<Site> = {}): Site {
     era_end: null,
     era_status: "unfetched",
     era_note: "",
+    note: null,
     attributes: {},
     article_url: null,
     summary: [],
@@ -59,6 +60,16 @@ describe("renderDetail", () => {
     expect(html).toContain("エリドゥ");
     expect(html).toContain("前9600年");
     expect(html).toContain("最古の層");
+  });
+  it("は era_status unfetched なら年代の行を出さず、note があれば出す", () => {
+    // sais 相当：年代なし、note「ネイト神殿」だけ出る。
+    const html = renderDetail(site({ era_status: "unfetched", era_start: null, era_note: "", note: "ネイト神殿" }));
+    expect(html).not.toContain('class="era"');
+    expect(html).toContain("ネイト神殿");
+  });
+  it("は note が無ければ note の欄を出さない", () => {
+    const html = renderDetail(site({ note: null }));
+    expect(html).not.toContain('class="note-line"');
   });
   it("は洪水層 absent と unknown を区別して出す", () => {
     const absent = renderDetail(site({ attributes: { flood_layer: "absent", layer_period: null, layer_note: null } }));

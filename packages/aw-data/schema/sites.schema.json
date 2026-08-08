@@ -23,6 +23,7 @@
         "era_end",
         "era_status",
         "era_note",
+        "note",
         "attributes",
         "article_url",
         "summary"
@@ -76,7 +77,11 @@
         },
         "era_note": {
           "type": "string",
-          "description": "年代の但し書き。無ければ空文字列"
+          "description": "年代の但し書き専用。例「最古の層」。年代（era_status: sourced）以外では空文字列"
+        },
+        "note": {
+          "type": ["string", "null"],
+          "description": "年代・洪水層と無関係の一般的な注記。無ければ null"
         },
         "attributes": {
           "type": "object",

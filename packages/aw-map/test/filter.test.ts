@@ -20,6 +20,7 @@ function site(overrides: Partial<Site> = {}): Site {
     coord_source: null,
     coord_ref: null,
     coord_status: "unfetched",
+    note: null,
     era_start: null,
     era_end: null,
     era_status: "unfetched",

@@ -39,6 +39,7 @@ function site(
     era_end: null,
     era_status: "unfetched",
     era_note: "",
+    note: null,
     attributes: {},
     article_url: null,
     summary: [],
@@ -65,16 +66,17 @@ const sites: Site[] = [
   site({ id: "gusir-hoyuk", name_ja: "ギュシル・ホユック", name_en: "Gusir Höyük", cluster: "t-pillars", country: "トルコ" }),
 
   // cluster: sumer（10・attributes あり。larak のみ unlocated）
+  // 洪水層と無関係の注記（王名表の…系）は note へ。洪水層についての注記だけ layer_note に残す。
   site({ id: "eridu", name_ja: "エリドゥ", name_en: "Eridu", cluster: "sumer", country: "イラク", attributes: flood("absent", null, "ウルから約23km") }),
-  site({ id: "bad-tibira", name_ja: "バド・ティビラ", name_en: "Bad-tibira", cluster: "sumer", country: "イラク", attributes: flood("unknown", null, "王名表の洪水前・第2") }),
-  site({ id: "larak", name_ja: "ララク", name_en: "Larak", cluster: "sumer", country: "イラク", coord_status: "unlocated", attributes: flood("unknown", null, "王名表の洪水前・第3") }),
-  site({ id: "sippar", name_ja: "シッパル", name_en: "Sippar", cluster: "sumer", country: "イラク", attributes: flood("unknown", null, "王名表の洪水前・第4") }),
-  site({ id: "shuruppak", name_ja: "シュルッパク", name_en: "Shuruppak", cluster: "sumer", country: "イラク", attributes: flood("present", "ジェムデト・ナスル期末〜初期王朝I期", "王名表の洪水前・最後") }),
+  site({ id: "bad-tibira", name_ja: "バド・ティビラ", name_en: "Bad-tibira", cluster: "sumer", country: "イラク", note: "王名表の洪水前・第2", attributes: flood("unknown", null, null) }),
+  site({ id: "larak", name_ja: "ララク", name_en: "Larak", cluster: "sumer", country: "イラク", coord_status: "unlocated", note: "王名表の洪水前・第3", attributes: flood("unknown", null, null) }),
+  site({ id: "sippar", name_ja: "シッパル", name_en: "Sippar", cluster: "sumer", country: "イラク", note: "王名表の洪水前・第4", attributes: flood("unknown", null, null) }),
+  site({ id: "shuruppak", name_ja: "シュルッパク", name_en: "Shuruppak", cluster: "sumer", country: "イラク", note: "王名表の洪水前・最後", attributes: flood("present", "ジェムデト・ナスル期末〜初期王朝I期", null) }),
   site({ id: "kish", name_ja: "キシュ", name_en: "Kish", cluster: "sumer", country: "イラク", attributes: flood("present", "前2900年頃 と 初期王朝III期", "層が2つ") }),
   site({ id: "ur", name_ja: "ウル", name_en: "Ur", cluster: "sumer", country: "イラク", attributes: flood("present", "前3500年以降", "ウーリーの発表は1929年") }),
   site({ id: "uruk", name_ja: "ウルク", name_en: "Uruk", cluster: "sumer", country: "イラク", attributes: flood("present", null, "厚さ約1.5m") }),
-  site({ id: "isin", name_ja: "イシン", name_en: "Isin", cluster: "sumer", country: "イラク", attributes: flood("unknown", null, "王名表の編纂主体") }),
-  site({ id: "larsa", name_ja: "ラルサ", name_en: "Larsa", cluster: "sumer", country: "イラク", attributes: flood("unknown", null, "WB444の出土地とされる") }),
+  site({ id: "isin", name_ja: "イシン", name_en: "Isin", cluster: "sumer", country: "イラク", note: "王名表の編纂主体", attributes: flood("unknown", null, null) }),
+  site({ id: "larsa", name_ja: "ラルサ", name_en: "Larsa", cluster: "sumer", country: "イラク", note: "WB444の出土地とされる", attributes: flood("unknown", null, null) }),
 
   // cluster: bronze-collapse（7）
   site({ id: "ugarit", name_ja: "ウガリット", name_en: "Ugarit", cluster: "bronze-collapse", country: "シリア" }),
@@ -85,18 +87,18 @@ const sites: Site[] = [
   site({ id: "troy", name_ja: "トロイ", name_en: "Troy", cluster: "bronze-collapse", country: "トルコ" }),
   site({ id: "carchemish", name_ja: "カルケミシュ", name_en: "Carchemish", cluster: "bronze-collapse", country: "トルコ／シリア" }),
 
-  // cluster: egypt（3。era_note は台帳の era_note 列どおり）
+  // cluster: egypt（3。年代の但し書きだけ era_note、それ以外の注記は note）
   site({ id: "dendera", name_ja: "デンデラ", name_en: "Dendera", cluster: "egypt", country: "エジプト", era_start: -54, era_status: "sourced", era_note: "ハトホル神殿の建造開始" }),
-  site({ id: "sais", name_ja: "サイス", name_en: "Sais", cluster: "egypt", country: "エジプト", era_note: "ネイト神殿" }),
-  site({ id: "giza", name_ja: "ギザ", name_en: "Giza", cluster: "egypt", country: "エジプト", era_note: "年代比較の基準" }),
+  site({ id: "sais", name_ja: "サイス", name_en: "Sais", cluster: "egypt", country: "エジプト", note: "ネイト神殿" }),
+  site({ id: "giza", name_ja: "ギザ", name_en: "Giza", cluster: "egypt", country: "エジプト", note: "年代比較の基準" }),
 
-  // cluster: japan（6。note 列は era_note に入れる。oshitoishi に Pleiades/other の但し書きを残す）
-  site({ id: "oshitoishi", name_ja: "押戸石の丘", name_en: "Oshitoishi", cluster: "japan", country: "日本", era_note: "南小国町指定の名勝。国指定史跡ではない。Pleiades 対象外・Wikidata にも登録が無い可能性があり、その場合は coord_source を other にして coord_ref に行政資料または地理院の出所を入れる" }),
+  // cluster: japan（6。年代の但し書き（kikai）だけ era_note、それ以外は note）
+  site({ id: "oshitoishi", name_ja: "押戸石の丘", name_en: "Oshitoishi", cluster: "japan", country: "日本", note: "南小国町指定の名勝。国指定史跡ではない。Pleiades 対象外・Wikidata にも登録が無い可能性があり、その場合は coord_source を other にして coord_ref に行政資料または地理院の出所を入れる" }),
   site({ id: "kikai-caldera", name_ja: "鬼界カルデラ", name_en: "Kikai Caldera", cluster: "japan", country: "日本", era_start: -5300, era_status: "sourced", era_note: "鬼界アカホヤ噴火" }),
-  site({ id: "uenohara", name_ja: "上野原遺跡", name_en: "Uenohara", cluster: "japan", country: "日本", era_note: "噴火前の南九州の文化" }),
+  site({ id: "uenohara", name_ja: "上野原遺跡", name_en: "Uenohara", cluster: "japan", country: "日本", note: "噴火前の南九州の文化" }),
   site({ id: "sannai-maruyama", name_ja: "三内丸山遺跡", name_en: "Sannai-Maruyama", cluster: "japan", country: "日本" }),
-  site({ id: "moyoro", name_ja: "モヨロ貝塚", name_en: "Moyoro", cluster: "japan", country: "日本", era_note: "オホーツク文化" }),
-  site({ id: "funadomari", name_ja: "船泊遺跡", name_en: "Funadomari", cluster: "japan", country: "日本", era_note: "縄文人ゲノムの解析対象" }),
+  site({ id: "moyoro", name_ja: "モヨロ貝塚", name_en: "Moyoro", cluster: "japan", country: "日本", note: "オホーツク文化" }),
+  site({ id: "funadomari", name_ja: "船泊遺跡", name_en: "Funadomari", cluster: "japan", country: "日本", note: "縄文人ゲノムの解析対象" }),
 
   // cluster: benchmark（2）
   site({ id: "stonehenge", name_ja: "ストーンヘンジ", name_en: "Stonehenge", cluster: "benchmark", country: "イギリス" }),
@@ -169,9 +171,22 @@ expect("era_status unfetched", sites.filter((s) => s.era_status === "unfetched")
 
 const floodOf = (s: Site) =>
   (s.attributes as Partial<FloodLayerAttributes>).flood_layer;
+const layerNoteOf = (s: Site) =>
+  (s.attributes as Partial<FloodLayerAttributes>).layer_note ?? null;
 expect("flood_layer present", sites.filter((s) => floodOf(s) === "present").length, 4);
 expect("flood_layer absent", sites.filter((s) => floodOf(s) === "absent").length, 1);
 expect("flood_layer unknown", sites.filter((s) => floodOf(s) === "unknown").length, 5);
+
+// note / era_note / layer_note の振り分け（作業A）。
+expect("note を持つ", sites.filter((s) => s.note !== null).length, 12);
+expect("era_note を持つ", sites.filter((s) => s.era_note.trim() !== "").length, 3);
+expect("layer_note を持つ", sites.filter((s) => layerNoteOf(s) !== null).length, 4);
+// era_note を持つ地点は era_status: sourced の3件とちょうど一致する（不変条件）。
+const eraNoteIds = sites.filter((s) => s.era_note.trim() !== "").map((s) => s.id).sort();
+const sourcedIds = sites.filter((s) => s.era_status === "sourced").map((s) => s.id).sort();
+if (JSON.stringify(eraNoteIds) !== JSON.stringify(sourcedIds)) {
+  problems.push(`era_note 保持 [${eraNoteIds}] が sourced [${sourcedIds}] と一致しない`);
+}
 
 // related_sites の参照先が全件 sites.json に存在するか。
 const siteIds = new Set(sites.map((s) => s.id));
@@ -200,5 +215,6 @@ process.stdout.write(
     `  coord_status: unlocated ${sites.filter((s) => s.coord_status === "unlocated").length} / unfetched ${sites.filter((s) => s.coord_status === "unfetched").length}\n` +
     `  era_status:   sourced ${sites.filter((s) => s.era_status === "sourced").length} / unfetched ${sites.filter((s) => s.era_status === "unfetched").length}\n` +
     `  flood_layer:  present ${sites.filter((s) => floodOf(s) === "present").length} / absent ${sites.filter((s) => floodOf(s) === "absent").length} / unknown ${sites.filter((s) => floodOf(s) === "unknown").length}\n` +
+    `  note ${sites.filter((s) => s.note !== null).length} / era_note ${sites.filter((s) => s.era_note.trim() !== "").length} / layer_note ${sites.filter((s) => layerNoteOf(s) !== null).length}\n` +
     `  related_sites を持つ events: ${relatedCount} 件\n`,
 );

@@ -27,7 +27,10 @@ export interface Site {
   era_start: number | null;
   era_end: number | null;
   era_status: EraStatus;
+  /** 年代の但し書き専用。年代（sourced）以外では空文字列。 */
   era_note: string;
+  /** 年代・洪水層と無関係の一般的な注記。無ければ null。 */
+  note: string | null;
   attributes: Record<string, unknown>;
   article_url: string | null;
   summary: string[];

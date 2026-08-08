@@ -57,7 +57,7 @@ import { sites, events, clusters, type Site } from "@aw/data";
 >
 > 内訳：coord_status = unlocated 1（larak）/ unfetched 37、era_status = sourced 3
 > （gobekli-tepe / dendera / kikai-caldera）/ unfetched 35、flood_layer = present 4 / absent 1
-> （eridu）/ unknown 5。
+> （eridu）/ unknown 5、note 12 / era_note 3 / layer_note 4。
 
 ## 座標を取得する手順（ネットワークのある環境で実行）
 
@@ -133,7 +133,18 @@ pnpm --filter @aw/data validate
 - 逆に、`verified` 以外（`ambiguous` / `unlocated` / `unfetched`）なのに座標が入っている行も落とす（未確定の座標を地図に出させない）
 - `coord_status: "verified"` なのに `coord_source` が null なら落とす（出所必須）
 - `coord_source: "other"` なのに `coord_ref`（出所 URL・文書名）が空なら落とす
+- `era_status: "unfetched"` なのに `era_note` があれば落とす（年代と無関係の注記は `note` へ）
+- `era_status: "sourced"` なのに `era_note` が空なら警告
+- `flood_layer: "unknown"` なのに `layer_note` があれば落とす（洪水層と無関係の注記は `note` へ）
 - 参照整合：`sites.cluster` が `clusters.json` に無い、`events.site_ids` が `sites.json` に無い場合は落とす
+
+注記フィールドの使い分け（`era_note` を持つ地点は `era_status: "sourced"` の 3 件とちょうど一致する不変条件）:
+
+| フィールド | 用途 | 件数 |
+|---|---|---|
+| `era_note` | 年代の但し書き専用 | 3（gobekli-tepe / dendera / kikai-caldera） |
+| `attributes.layer_note` | 洪水層についての注記 | 4（eridu / kish / ur / uruk） |
+| `note` | 年代・洪水層と無関係の一般的な注記 | 12 |
 - id の重複で落とす
 - `era_start` が正（紀元後）なのに `era_note` が空なら警告（落とさない）
 
@@ -164,7 +175,8 @@ pnpm --filter @aw/data test
 | `era_start` | integer | 負が紀元前。例 `-9600` |
 | `era_end` | integer \| null | |
 | `era_status` | `"sourced"` \| `"unfetched"` | |
-| `era_note` | string | 年代の但し書き。例「最古の層」 |
+| `era_note` | string | **年代の但し書き専用**。例「最古の層」。sourced 以外は空 |
+| `note` | string \| null | 年代・洪水層と無関係の一般的な注記 |
 | `attributes` | object | クラスタごとに異なる属性 |
 | `article_url` | string \| null | |
 | `summary` | string[]（最大 3） | 1 要素 1 文 |

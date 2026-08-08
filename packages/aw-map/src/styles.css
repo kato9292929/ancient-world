@@ -102,6 +102,7 @@ body { margin: 0; color: var(--ink); background: var(--paper); line-height: 1.6;
 .country { margin: 0 0 0.5rem; font-size: 0.9rem; }
 .detail .era { margin: 0 0 0.6rem; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
 .detail .era .note { color: var(--muted); font-weight: 400; }
+.note-line { margin: 0 0 0.6rem; font-size: 0.9rem; }
 .attrs { margin: 0 0 0.6rem; padding: 0.5rem 0.6rem; background: var(--paper); border-radius: 0.4rem; }
 .attr { display: flex; gap: 0.5rem; font-size: 0.85rem; }
 .attr dt { color: var(--muted); min-width: 3rem; margin: 0; }

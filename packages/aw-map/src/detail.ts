@@ -16,19 +16,22 @@ function formatYear(n: number): string {
   return "0年";
 }
 
-// 年代の行。数字だけを出さない：era_note があれば必ず添える。
+// 年代の行。era_status: sourced のときだけ出す。unfetched は年代の行も era_note も出さない。
+// 数字だけを出さない：era_note があれば必ず添える。
 function eraLine(s: Site): string {
-  const hasYear = s.era_start !== null;
-  const year = hasYear ? formatYear(s.era_start as number) : "";
+  if (s.era_status !== "sourced" || s.era_start === null) return "";
+  const year = formatYear(s.era_start);
   const range =
-    hasYear && s.era_end !== null && s.era_end !== s.era_start
-      ? `${year}〜${formatYear(s.era_end)}`
-      : year;
+    s.era_end !== null && s.era_end !== s.era_start ? `${year}〜${formatYear(s.era_end)}` : year;
   const note = s.era_note.trim();
-  if (!range && !note) return "";
-  const noteHtml = note ? `<span class="note">${escapeHtml(note)}</span>` : "";
-  const label = range ? escapeHtml(range) : "";
-  return `<p class="era">${label}${label && noteHtml ? " " : ""}${noteHtml}</p>`;
+  const noteHtml = note ? ` <span class="note">${escapeHtml(note)}</span>` : "";
+  return `<p class="era">${escapeHtml(range)}${noteHtml}</p>`;
+}
+
+// 一般的な注記。年代の有無に関わらず、あれば出す。無ければ欄を出さない。
+function noteLine(s: Site): string {
+  if (!s.note || s.note.trim() === "") return "";
+  return `<p class="note-line">${escapeHtml(s.note)}</p>`;
 }
 
 // 洪水層クラスタの属性表示。present/absent/unknown を区別して出す。
@@ -71,6 +74,7 @@ export function renderDetail(site: Site | null): string {
   <p class="name-en">${escapeHtml(site.name_en)}</p>
   <p class="country">${escapeHtml(site.country)}</p>
   ${eraLine(site)}
+  ${noteLine(site)}
   ${floodAttrs(site.attributes as Record<string, unknown>)}
   ${coordLine}
   ${summaryList(site.summary)}
