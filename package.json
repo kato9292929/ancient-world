@@ -11,7 +11,8 @@
     "validate": "pnpm -r --if-present run validate",
     "test": "pnpm -r --if-present run test",
     "typecheck": "pnpm -r --if-present run typecheck",
-    "build": "pnpm -r --if-present run build"
+    "build": "pnpm -r --if-present run build",
+    "preview:build": "node scripts/build-preview.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
