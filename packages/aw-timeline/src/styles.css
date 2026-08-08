@@ -1,0 +1,233 @@
+/* システムフォントのスタックで組む。外部フォント CDN に依存しない。 */
+:root {
+  --ink: #1a1a1a;
+  --paper: #faf8f4;
+  --line: #d8d2c8;
+  --accent: #7a5c3e;
+  --muted: #6b6559;
+  --axis-w: 7.5rem;
+  font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP",
+    "Yu Gothic", Meiryo, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.7;
+}
+
+.page-head {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 1.5rem;
+}
+.page-head h1 {
+  font-size: 2rem;
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.02em;
+}
+.lede {
+  color: var(--muted);
+  margin: 0 0 1rem;
+}
+.hidden-note {
+  font-size: 0.85rem;
+  color: var(--muted);
+  border-left: 3px solid var(--line);
+  padding-left: 0.75rem;
+}
+
+/* 表示中の年代。JS 有効時だけ出す。JS 無効なら誤読させないよう隠す。 */
+.readout {
+  position: sticky;
+  top: 1rem;
+  z-index: 5;
+  width: max-content;
+  margin: 0 auto 0 1.5rem;
+  padding: 0.4rem 0.9rem;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+}
+.readout-label {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+.readout-year {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.no-js .readout {
+  display: none;
+}
+
+.timeline {
+  position: relative;
+  max-width: 48rem;
+  margin: 2rem auto 6rem;
+  padding-left: var(--axis-w);
+}
+
+/* 左の年代目盛り。定義域全体を線形で刻む。後半に出来事が無いことが、この目盛りで見える。 */
+.axis {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--axis-w);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-right: 2px solid var(--line);
+}
+.axis .tick {
+  position: absolute;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.axis .tick::after {
+  content: "";
+  position: absolute;
+  right: -0.5rem;
+  top: 50%;
+  width: 0.5rem;
+  height: 1px;
+  background: var(--line);
+}
+
+.events {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  height: 100%;
+}
+.event {
+  position: absolute;
+  left: 1.5rem;
+  right: 0;
+  transform: translateY(-0.5rem);
+}
+/* 幅のある年代は band として描く（点にしない）。 */
+.event .band {
+  position: absolute;
+  left: -1.5rem;
+  top: 0;
+  width: 3px;
+  background: var(--accent);
+  opacity: 0.5;
+}
+/* 衝突回避で下にずれたカードから、真の年代位置へ引き出す線。上端に位置の点を打つ。 */
+.event .leader {
+  position: absolute;
+  left: -1.5rem;
+  width: 2px;
+  background: var(--accent);
+  opacity: 0.4;
+}
+.event .leader::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.9;
+}
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.era {
+  margin: 0 0 0.25rem;
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.era .note {
+  color: var(--muted);
+  font-weight: 400;
+}
+.card h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.15rem;
+}
+.desc {
+  margin: 0 0 0.6rem;
+}
+.sites {
+  margin: 0 0 0.6rem;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.sites li a {
+  display: inline-block;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--accent);
+  text-decoration: none;
+}
+.sites li a:hover {
+  background: var(--paper);
+}
+.article {
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+.empty,
+.hidden-note code {
+  color: var(--muted);
+}
+.empty {
+  position: absolute;
+  top: 0;
+  left: 1.5rem;
+  right: 0;
+}
+
+/* 入場アニメーションは JS 有効かつ動きが許可されているときだけ。 */
+.js .event .card {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .js .event .card {
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .js .event.in-view .card {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* 動きを減らす設定、または JS 無効なら、常に全項目が見える。 */
+@media (prefers-reduced-motion: reduce) {
+  .event .card {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

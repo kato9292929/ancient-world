@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "id": "t-pillars",
+    "name_ja": "T字柱の遺跡群",
+    "note": "先土器新石器時代A"
+  },
+  {
+    "id": "sumer",
+    "name_ja": "シュメールの都市",
+    "note": "王名表と洪水層"
+  },
+  {
+    "id": "bronze-collapse",
+    "name_ja": "青銅器時代の崩壊",
+    "note": "前1200年頃に放棄された都市"
+  },
+  {
+    "id": "egypt",
+    "name_ja": "エジプト",
+    "note": "アトランティス伝承の関係地"
+  },
+  {
+    "id": "japan",
+    "name_ja": "日本",
+    "note": "縄文とオホーツク"
+  },
+  {
+    "id": "benchmark",
+    "name_ja": "比較の基準点",
+    "note": "年代比較のための参照"
+  },
+  {
+    "id": "missoula",
+    "name_ja": "ミズーラ洪水",
+    "note": "記事を書く場合のみ"
+  }
+]

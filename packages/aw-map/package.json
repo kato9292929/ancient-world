@@ -1,0 +1,23 @@
+{
+  "name": "@aw/map",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "遺跡年代マップ。年代スライダー付きの世界地図に、約38地点をピンで置く。",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsx scripts/og.ts",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aw/data": "workspace:*",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/topojson-client": "^3.1.5",
+    "vite": "^5.4.11"
+  }
+}

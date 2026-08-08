@@ -83,12 +83,38 @@ export function validateData(data: DataSet, schemas: Schemas): ValidateResult {
         message: `coord_status が "verified" だが lat/lng が null`,
       });
     }
-    // verified なのに出所がないのは不整合。警告に留める。
+    // 逆に、確定していない（ambiguous / unlocated / unfetched）のに座標が入っているのは不整合。
+    // 確定していない座標を地図に出させないため落とす。
+    if (s.coord_status !== "verified" && (s.lat !== null || s.lng !== null)) {
+      errors.push({
+        level: "error",
+        where: at,
+        message: `coord_status が "${s.coord_status}" なのに lat/lng が入っている`,
+      });
+    }
+    // verified なのに出所がないのは落とす。「出所が書けないものは入れない」を担保する。
     if (s.coord_status === "verified" && s.coord_source === null) {
+      errors.push({
+        level: "error",
+        where: at,
+        message: `coord_status が "verified" だが coord_source が null（出所を必須にする）`,
+      });
+    }
+    // coord_source が "other"（Wikidata/Pleiades 以外）なら、出所の URL か文書名を必ず持たせる。
+    // これで推測での埋めを防ぎつつ、第3の出所からの座標を受け入れられる。
+    if (s.coord_source === "other" && (s.coord_ref === null || s.coord_ref.trim() === "")) {
+      errors.push({
+        level: "error",
+        where: at,
+        message: `coord_source が "other" なのに coord_ref（出所URL・文書名）が空`,
+      });
+    }
+    // unlocated は所在未特定。取得しても埋まらないので座標も出所も持たない前提。
+    if (s.coord_status === "unlocated" && s.coord_source !== null) {
       warnings.push({
         level: "warning",
         where: at,
-        message: `coord_status が "verified" だが coord_source が null`,
+        message: `coord_status が "unlocated" なのに coord_source が入っている`,
       });
     }
     // 参照整合。cluster が clusters.json に無ければ落とす。
@@ -99,12 +125,40 @@ export function validateData(data: DataSet, schemas: Schemas): ValidateResult {
         message: `cluster "${s.cluster}" が clusters.json に無い`,
       });
     }
-    // era_start が紀元後（正）なのに但し書きが無ければ警告。
-    if (s.era_start > 0 && s.era_note.trim() === "") {
+    // era_start が紀元後（正）なのに但し書きが無ければ警告。null（未取得）は対象外。
+    if (s.era_start !== null && s.era_start > 0 && s.era_note.trim() === "") {
       warnings.push({
         level: "warning",
         where: at,
         message: `era_start が正（紀元後 ${s.era_start}）だが era_note が空`,
+      });
+    }
+
+    // era_note は年代の但し書き専用。unfetched は持たない／sourced は持つ、を不変条件にする。
+    const hasEraNote = s.era_note.trim() !== "";
+    if (s.era_status === "unfetched" && hasEraNote) {
+      errors.push({
+        level: "error",
+        where: at,
+        message: `era_status が "unfetched" なのに era_note がある（note へ移す）`,
+      });
+    }
+    if (s.era_status === "sourced" && !hasEraNote) {
+      warnings.push({
+        level: "warning",
+        where: at,
+        message: `era_status が "sourced" だが era_note が空`,
+      });
+    }
+
+    // flood_layer が unknown なら layer_note を持たない（洪水層と無関係の注記は note へ）。
+    const attrs = s.attributes as Record<string, unknown>;
+    const layerNote = typeof attrs["layer_note"] === "string" ? (attrs["layer_note"] as string) : "";
+    if (attrs["flood_layer"] === "unknown" && layerNote.trim() !== "") {
+      errors.push({
+        level: "error",
+        where: at,
+        message: `flood_layer が "unknown" なのに layer_note がある（note へ移す）`,
       });
     }
   }

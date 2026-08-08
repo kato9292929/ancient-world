@@ -16,7 +16,9 @@ function site(overrides: Partial<Site> = {}): Site {
     lat: null,
     lng: null,
     coord_source: null,
+    coord_ref: null,
     coord_status: "unfetched",
+    note: null,
     era_start: -9000,
     era_end: null,
     era_status: "sourced",
@@ -82,5 +84,38 @@ describe("fetchSiteCoord（フィクスチャを注入）", () => {
     const r = await fetchSiteCoord(site({ attributes: { pleiades_id: "912986" } }), deps);
     expect(r.status).toBe("verified");
     if (r.status === "verified") expect(r.source).toBe("pleiades");
+  });
+
+  it("は Pleiades を優先し、両方から取れても ambiguous にしない", async () => {
+    // 源をまたいで連結していたら 2 候補で ambiguous になるが、Pleiades 優先なので verified。
+    const pleiades = parsePleiadesResponse({ id: "912986", reprPoint: [46.0, 30.816667] })!;
+    let wikidataCalled = false;
+    const deps: FetchDeps = {
+      fetchWikidata: async () => {
+        wikidataCalled = true;
+        return parseWikidataResponse(wikidataSingle);
+      },
+      fetchPleiades: async () => [pleiades],
+    };
+    const r = await fetchSiteCoord(site(), deps);
+    expect(r.status).toBe("verified");
+    if (r.status === "verified") expect(r.source).toBe("pleiades");
+    // Pleiades で決まったら Wikidata は見ない。
+    expect(wikidataCalled).toBe(false);
+  });
+
+  it("は Pleiades が空のときだけ Wikidata を見る", async () => {
+    let wikidataCalled = false;
+    const deps: FetchDeps = {
+      fetchWikidata: async () => {
+        wikidataCalled = true;
+        return parseWikidataResponse(wikidataSingle);
+      },
+      fetchPleiades: async () => [],
+    };
+    const r = await fetchSiteCoord(site(), deps);
+    expect(wikidataCalled).toBe(true);
+    expect(r.status).toBe("verified");
+    if (r.status === "verified") expect(r.source).toBe("wikidata");
   });
 });
