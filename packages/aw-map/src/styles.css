@@ -1,0 +1,113 @@
+/* システムフォント。外部フォント CDN に依存しない。 */
+:root {
+  --ink: #1a1a1a;
+  --paper: #faf8f4;
+  --panel: #ffffff;
+  --line: #d8d2c8;
+  --accent: #7a5c3e;
+  --muted: #6b6559;
+  --ocean: #e8eef1;
+  --land: #efe9df;
+  --land-line: #cfc7b8;
+  --pin: #b5462f;
+  font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP",
+    "Yu Gothic", Meiryo, sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--paper); line-height: 1.6; }
+
+.page-head { padding: 1.5rem 1.5rem 0.5rem; max-width: 60rem; }
+.page-head h1 { margin: 0 0 0.3rem; font-size: 1.6rem; }
+.lede { color: var(--muted); margin: 0; font-size: 0.9rem; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 18rem 1fr 18rem;
+  gap: 1rem;
+  padding: 1rem 1.5rem 3rem;
+  align-items: start;
+}
+@media (max-width: 60rem) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.col-left, .col-right {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* --- 地図 --- */
+.map-wrap { background: var(--panel); border: 1px solid var(--line); border-radius: 0.5rem; }
+.worldmap { display: block; width: 100%; height: auto; }
+.ocean { fill: var(--ocean); }
+.country { fill: var(--land); stroke: var(--land-line); stroke-width: 0.5; }
+.pin { cursor: pointer; }
+.pin-dot { fill: var(--pin); stroke: #fff; stroke-width: 1.5; }
+.pin.is-selected .pin-dot { fill: var(--accent); r: 8; }
+.pin:focus { outline: none; }
+.pin:focus .pin-dot { stroke: var(--accent); stroke-width: 2.5; }
+
+/* --- スライダー --- */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.25rem;
+  flex-wrap: wrap;
+}
+.slider-row label { font-size: 0.85rem; color: var(--muted); }
+#year-slider { flex: 1; min-width: 12rem; }
+.year-label { font-weight: 600; font-variant-numeric: tabular-nums; min-width: 6rem; }
+.pin-count { font-size: 0.85rem; color: var(--muted); }
+
+/* --- クラスタ一覧 --- */
+.clusters-head { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.5rem; }
+.clear-filter { border: none; background: none; color: var(--accent); cursor: pointer; padding: 0; font: inherit; text-decoration: underline; }
+.cluster { margin-bottom: 0.75rem; }
+.cluster.is-active { }
+.cluster-head {
+  display: flex; justify-content: space-between; align-items: baseline; width: 100%;
+  border: none; background: none; cursor: pointer; font: inherit; padding: 0.25rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.cluster.is-active .cluster-head { color: var(--accent); font-weight: 600; }
+.cl-name { text-align: left; }
+.cl-count { font-variant-numeric: tabular-nums; color: var(--muted); }
+.cl-breakdown { display: block; font-size: 0.72rem; color: var(--muted); margin: 0.15rem 0; }
+.site-list { list-style: none; margin: 0.25rem 0 0; padding: 0; }
+.site-row {
+  display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; width: 100%;
+  border: none; background: none; cursor: pointer; font: inherit; padding: 0.25rem 0.35rem;
+  border-radius: 0.25rem; text-align: left;
+}
+.site-row:hover { background: var(--paper); }
+.site-row.is-selected { background: var(--paper); box-shadow: inset 3px 0 0 var(--accent); }
+.site-name { flex: 1; }
+.badge { font-size: 0.68rem; padding: 0.05rem 0.4rem; border-radius: 999px; white-space: nowrap; }
+.badge-verified { background: #e7efe3; color: #3f6b3f; }
+.badge-unfetched { background: #eee; color: var(--muted); }
+.badge-unlocated { background: #f3e7e7; color: #8a4b4b; }
+.badge-ambiguous { background: #efe9d8; color: #7a6a2f; }
+
+/* --- 詳細パネル --- */
+.detail-empty { color: var(--muted); font-size: 0.9rem; }
+.detail h2 { margin: 0 0 0.1rem; font-size: 1.25rem; }
+.name-en { margin: 0 0 0.1rem; color: var(--muted); font-size: 0.85rem; }
+.country { margin: 0 0 0.5rem; font-size: 0.9rem; }
+.detail .era { margin: 0 0 0.6rem; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
+.detail .era .note { color: var(--muted); font-weight: 400; }
+.attrs { margin: 0 0 0.6rem; padding: 0.5rem 0.6rem; background: var(--paper); border-radius: 0.4rem; }
+.attr { display: flex; gap: 0.5rem; font-size: 0.85rem; }
+.attr dt { color: var(--muted); min-width: 3rem; margin: 0; }
+.attr dd { margin: 0; }
+.coord { font-variant-numeric: tabular-nums; font-size: 0.85rem; margin: 0 0 0.6rem; }
+.coord .src { color: var(--muted); }
+.coord-missing { color: var(--muted); }
+.summary { margin: 0 0 0.6rem; padding-left: 1.1rem; }
+.more { display: inline-block; color: var(--accent); font-size: 0.9rem; }
