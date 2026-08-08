@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>遺物の3Dビューア — ancient world</title>
+    <meta name="description" content="記録された寸法から起こした模型（Weld-Blundell Prism）。" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <header class="page-head">
+      <h1>Weld-Blundell Prism</h1>
+      <p class="name-en">四面の角柱・中央に軸穴</p>
+    </header>
+
+    <!-- 模型であることのラベル。折りたたまず、初期表示で常に見える位置に置く。 -->
+    <p class="model-label" role="note">
+      これは実物のスキャンではなく、<strong>記録された寸法から起こした模型</strong>です。
+      <strong>刻文は再現していません</strong>（面には欄の区切りだけを示しています）。
+    </p>
+
+    <main class="layout">
+      <div id="stage" class="stage" aria-label="3D ビューア"></div>
+      <aside class="side">
+        <p class="hint">ドラッグで縦軸まわりに回転／ホイールで拡大縮小／面をクリックすると説明が出ます。</p>
+        <div id="face-panel" class="face-panel" hidden></div>
+      </aside>
+    </main>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "@aw/objects",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "遺物の3Dビューア。記録された寸法から起こした模型（Weld-Blundell Prism）。",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "three": "^0.171.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.171.0",
+    "vite": "^5.4.11"
+  }
+}

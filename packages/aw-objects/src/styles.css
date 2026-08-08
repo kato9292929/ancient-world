@@ -1,0 +1,67 @@
+:root {
+  --ink: #1a1a1a;
+  --paper: #faf8f4;
+  --panel: #fff;
+  --line: #d8d2c8;
+  --accent: #7a5c3e;
+  --muted: #6b6559;
+  font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP",
+    "Yu Gothic", Meiryo, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--paper); line-height: 1.6; }
+
+.page-head { padding: 1.25rem 1.5rem 0; }
+.page-head h1 { margin: 0 0 0.15rem; font-size: 1.5rem; }
+.name-en { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+/* 模型であることのラベル。常時見える。隠さない。 */
+.model-label {
+  margin: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
+  background: #efe6d6;
+  border: 1px solid #d8c9a8;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  color: #5a4a2e;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 20rem;
+  gap: 1rem;
+  padding: 0 1.5rem 3rem;
+  align-items: start;
+}
+@media (max-width: 52rem) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.stage {
+  width: 100%;
+  height: 70vh;
+  min-height: 24rem;
+  background: #f3efe7;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  touch-action: none;
+}
+.stage canvas { display: block; }
+
+.side {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+.hint { font-size: 0.82rem; color: var(--muted); margin: 0 0 0.75rem; }
+.face-panel { border-top: 1px solid var(--line); padding-top: 0.75rem; }
+.face-index { font-size: 0.8rem; color: var(--accent); font-weight: 600; margin: 0 0 0.25rem; }
+.face-empty { color: var(--muted); font-size: 0.9rem; }
+.face-panel h2 { font-size: 1.05rem; margin: 0 0 0.4rem; }
+
+/* フォールバック（WebGL 非対応） */
+.fallback { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 1rem; }
+.fallback-svg { max-width: 100%; max-height: 90%; }
+.fallback-note { color: var(--muted); font-size: 0.9rem; text-align: center; margin: 0.5rem 0 0; }
