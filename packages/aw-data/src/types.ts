@@ -24,7 +24,7 @@ export interface Site {
   /** 出所の識別子・文書名。wikidata=Qコード、pleiades=ID、other=出所URLか文書名（必須）。 */
   coord_ref: string | null;
   coord_status: CoordStatus;
-  era_start: number;
+  era_start: number | null;
   era_end: number | null;
   era_status: EraStatus;
   era_note: string;
@@ -48,7 +48,7 @@ export interface AwEvent {
 export interface Cluster {
   id: string;
   name_ja: string;
-  name_en: string;
+  name_en?: string;
   note?: string;
 }
 

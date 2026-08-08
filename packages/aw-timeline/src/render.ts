@@ -64,12 +64,15 @@ function eventHtml(e: AwEvent, d: Domain, siteById: Map<string, Site>, mapBase: 
     ? `<a class="article" href="${escapeHtml(e.article_url)}">記事を読む</a>`
     : "";
   const dataYear = `${yearLabel}${note ? " " + note : ""}`;
+  const desc = e.description.trim()
+    ? `<p class="desc">${escapeHtml(e.description)}</p>`
+    : "";
   return `<li class="event" style="top:${pct(band.top)}" data-year="${escapeHtml(dataYear)}">
   ${bandHtml}
   <article class="card">
     <p class="era">${escapeHtml(yearLabel)}${noteHtml}</p>
     <h2>${escapeHtml(e.title)}</h2>
-    <p class="desc">${escapeHtml(e.description)}</p>
+    ${desc}
     ${relatedSitesHtml(e, siteById, mapBase)}
     ${article}
   </article>

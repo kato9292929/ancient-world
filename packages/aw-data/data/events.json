@@ -1,1 +1,181 @@
-[]
+[
+  {
+    "id": "yd-end",
+    "title": "ヤンガードリアス終焉",
+    "description": "",
+    "era_start": -9700,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [],
+    "article_url": null
+  },
+  {
+    "id": "gobekli-oldest",
+    "title": "ギョベクリ・テペ最古の層",
+    "description": "",
+    "era_start": -9600,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [
+      "gobekli-tepe"
+    ],
+    "article_url": null
+  },
+  {
+    "id": "ubaid-start",
+    "title": "ウバイド期の開始",
+    "description": "",
+    "era_start": -5500,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [],
+    "article_url": null
+  },
+  {
+    "id": "kikai-akahoya",
+    "title": "鬼界アカホヤ噴火",
+    "description": "",
+    "era_start": -5300,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [
+      "kikai-caldera",
+      "uenohara"
+    ],
+    "article_url": null
+  },
+  {
+    "id": "cuneiform",
+    "title": "楔形文字の成立",
+    "description": "",
+    "era_start": -3200,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [],
+    "article_url": null
+  },
+  {
+    "id": "flood-layers",
+    "title": "キシュ・シュルッパクの洪水層",
+    "description": "",
+    "era_start": -2900,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [
+      "kish",
+      "shuruppak"
+    ],
+    "article_url": null
+  },
+  {
+    "id": "wb444",
+    "title": "Weld-Blundell Prism の成立",
+    "description": "",
+    "era_start": -1800,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [
+      "larsa",
+      "isin"
+    ],
+    "article_url": null
+  },
+  {
+    "id": "bronze-collapse",
+    "title": "青銅器時代の崩壊",
+    "description": "",
+    "era_start": -1200,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [
+      "ugarit",
+      "hattusa",
+      "mycenae",
+      "pylos",
+      "tiryns",
+      "troy",
+      "carchemish"
+    ],
+    "article_url": null
+  },
+  {
+    "id": "sterno-etrussia",
+    "title": "ステルノ・エトルリア地磁気エクスカーション",
+    "description": "",
+    "era_start": -750,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [],
+    "article_url": null
+  },
+  {
+    "id": "solon-egypt",
+    "title": "ソロンのエジプト訪問とされる年代",
+    "description": "",
+    "era_start": -600,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [
+      "sais"
+    ],
+    "article_url": null
+  },
+  {
+    "id": "plato-death",
+    "title": "プラトン没",
+    "description": "",
+    "era_start": -347,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [],
+    "article_url": null
+  },
+  {
+    "id": "nectanebo-dendera",
+    "title": "デンデラ、ネクタネボ2世の建造",
+    "description": "",
+    "era_start": -345,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [
+      "dendera"
+    ],
+    "article_url": null
+  },
+  {
+    "id": "enoch-watchers",
+    "title": "エノク書・監視者篇の成立",
+    "description": "",
+    "era_start": -300,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "頃",
+    "site_ids": [],
+    "article_url": null
+  },
+  {
+    "id": "dendera-hathor",
+    "title": "現在のハトホル神殿の建造開始",
+    "description": "",
+    "era_start": -54,
+    "era_end": null,
+    "era_status": "sourced",
+    "era_note": "",
+    "site_ids": [
+      "dendera"
+    ],
+    "article_url": null
+  }
+]

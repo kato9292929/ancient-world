@@ -51,8 +51,13 @@ import { sites, events, clusters, type Site } from "@aw/data";
 - `summary` は空配列（記事側の作業）
 - 台帳にない地点・年代を足さない／推測で埋めない
 
-> 現在 `data/*.json` は空配列。台帳が入り次第、上のルールで投入する。スキーマ・検証・
-> 座標取得のテストは台帳の中身に依存しないため、投入は「入れるだけ」で済む。
+> 投入済み。`data/*.json` は台帳の全件（sites 38 / events 14 / clusters 7）を含む。投入は
+> `scripts/ingest-inventory.ts`（台帳を写した一度きりのスクリプト。件数を自己検証してから書き出す）
+> で行った。座標は全件 null のまま（正常な完了状態）。`validate` が通る。
+>
+> 内訳：coord_status = unlocated 1（larak）/ unfetched 37、era_status = sourced 3
+> （gobekli-tepe / dendera / kikai-caldera）/ unfetched 35、flood_layer = present 4 / absent 1
+> （eridu）/ unknown 5。
 
 ## 座標を取得する手順（ネットワークのある環境で実行）
 

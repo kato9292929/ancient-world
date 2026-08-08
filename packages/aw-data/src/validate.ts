@@ -125,8 +125,8 @@ export function validateData(data: DataSet, schemas: Schemas): ValidateResult {
         message: `cluster "${s.cluster}" が clusters.json に無い`,
       });
     }
-    // era_start が紀元後（正）なのに但し書きが無ければ警告。
-    if (s.era_start > 0 && s.era_note.trim() === "") {
+    // era_start が紀元後（正）なのに但し書きが無ければ警告。null（未取得）は対象外。
+    if (s.era_start !== null && s.era_start > 0 && s.era_note.trim() === "") {
       warnings.push({
         level: "warning",
         where: at,
