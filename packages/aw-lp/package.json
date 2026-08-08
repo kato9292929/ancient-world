@@ -1,0 +1,16 @@
+{
+  "name": "@aw/lp",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ancient world のトップページ。データ由来のモーションと、完成済みビジュアルへの入口。",
+  "scripts": {
+    "build": "tsx scripts/build.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aw/data": "workspace:*"
+  }
+}
