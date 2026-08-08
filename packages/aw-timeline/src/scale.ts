@@ -81,6 +81,26 @@ export function mapSiteUrl(id: string, base: string): string {
   return `${b}?site=${encodeURIComponent(id)}`;
 }
 
+/**
+ * カードの衝突回避。各カードの「真の位置」(trueTop, px) は動かさず、前のカードと重なる時だけ
+ * 最小間隔 gap を空けて下へずらす。返すのは各カードの実際の top(px)。軸の目盛りは真の位置の
+ * ままにして、ずれたカードには引き出し線を引く（案A の線形尺度を保つ）。
+ * items は trueTop の昇順で渡すこと。
+ */
+export function resolveCollisions(
+  items: { trueTop: number; height: number }[],
+  gap: number,
+): number[] {
+  const tops: number[] = [];
+  let prevBottom = -Infinity;
+  for (const it of items) {
+    const top = Math.max(it.trueTop, prevBottom + gap);
+    tops.push(top);
+    prevBottom = top + it.height;
+  }
+  return tops;
+}
+
 /** 1000 年ごとの目盛り年を、定義域全体で返す（線形尺度を可視化するため）。 */
 export function axisTicks(d: Domain, step = 1000): number[] {
   const first = Math.ceil(d.min / step) * step;

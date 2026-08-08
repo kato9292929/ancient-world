@@ -1,8 +1,10 @@
 // events.json / sites.json から静的な年表 HTML を組む。
 //
 // 方針:
-//   - 全出来事を古い順に、線形尺度（案A）の位置へ絶対配置する。年ごとの実際の間隔が縦の距離に
+//   - 全出来事を古い順に、線形尺度（案A）の位置へ配置する。年ごとの実際の間隔が縦の距離に
 //     出る。前1000年以降は出来事が無く、空白として見える。それでよい（案A）。
+//   - ただし近すぎて重なる時だけ、カードを最小間隔で下へずらす（衝突回避）。軸の目盛りは真の
+//     年代位置のままにして、ずれたカードには真の位置への引き出し線を引く。尺度は保つ。
 //   - JavaScript が無くても、年代順に並んだ静的な一覧として全項目が読める。
 //   - スクロール連動の年代表示は JS による上乗せ。JS 無効時は隠す（誤読させない）。
 import type { AwEvent, Site } from "@aw/data";
@@ -16,6 +18,7 @@ import {
   mapSiteUrl,
   axisTicks,
   formatYear,
+  resolveCollisions,
 } from "./scale.js";
 
 export interface RenderOptions {
@@ -28,6 +31,9 @@ export interface RenderOptions {
   enhanceJs: string;
 }
 
+/** 重なり回避でカードの間に最低限空ける間隔(px)。 */
+const COLLISION_GAP = 14;
+
 export function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -36,8 +42,20 @@ export function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function pct(f: number): string {
-  return (f * 100).toFixed(3) + "%";
+function px(n: number): string {
+  return Math.round(n) + "px";
+}
+
+// カード高さの見積り。実測ではなく内容からの概算。衝突回避の判定に使うだけなので、
+// 重なりを防ぐ側に少し多めに見積もる。
+function estimateCardHeight(e: AwEvent, siteCount: number): number {
+  let h = 40; // padding + border + 余白
+  h += 22; // era 行
+  h += Math.max(1, Math.ceil(e.title.length / 22)) * 28; // 見出し（22字/行の概算）
+  if (e.description.trim()) h += Math.max(1, Math.ceil(e.description.length / 32)) * 24;
+  if (siteCount > 0) h += Math.ceil(siteCount / 4) * 32; // 地点チップ（4個/行の概算）
+  if (e.article_url) h += 24;
+  return h;
 }
 
 function relatedSitesHtml(e: AwEvent, siteById: Map<string, Site>, mapBase: string): string {
@@ -51,23 +69,38 @@ function relatedSitesHtml(e: AwEvent, siteById: Map<string, Site>, mapBase: stri
   return `<ul class="sites" aria-label="関連地点">${items.join("")}</ul>`;
 }
 
-function eventHtml(e: AwEvent, d: Domain, siteById: Map<string, Site>, mapBase: string): string {
+function eventHtml(
+  e: AwEvent,
+  d: Domain,
+  heightPx: number,
+  topPx: number,
+  trueTopPx: number,
+  siteById: Map<string, Site>,
+  mapBase: string,
+): string {
   const band = eventBand(e, d);
-  const { yearLabel, note } = formatEra(e.era_start, e.era_end, e.era_note);
+  const { yearLabel, note } = formatEra(e.era_start ?? 0, e.era_end, e.era_note);
   const noteHtml = note ? ` <span class="note">${escapeHtml(note)}</span>` : "";
-  // 幅のあるものは band を描く（点にしない）。
+  // 幅のあるものは band を描く（点にしない）。px で高さを持たせる。
   const bandHtml =
     band.height > 0
-      ? `<span class="band" style="height:${pct(band.height)}" aria-hidden="true"></span>`
+      ? `<span class="band" style="height:${px(band.height * heightPx)}" aria-hidden="true"></span>`
+      : "";
+  // 衝突回避で真の位置からずれたカードには、真の年代位置への引き出しを出す。
+  const offset = topPx - trueTopPx;
+  const leaderHtml =
+    offset > 1
+      ? `<span class="leader" style="top:${px(-offset)};height:${px(offset)}" aria-hidden="true"></span>`
       : "";
   const article = e.article_url
     ? `<a class="article" href="${escapeHtml(e.article_url)}">記事を読む</a>`
     : "";
-  const dataYear = `${yearLabel}${note ? " " + note : ""}`;
   const desc = e.description.trim()
     ? `<p class="desc">${escapeHtml(e.description)}</p>`
     : "";
-  return `<li class="event" style="top:${pct(band.top)}" data-year="${escapeHtml(dataYear)}">
+  const dataYear = `${yearLabel}${note ? " " + note : ""}`;
+  return `<li class="event" style="top:${px(topPx)}" data-year="${escapeHtml(dataYear)}">
+  ${leaderHtml}
   ${bandHtml}
   <article class="card">
     <p class="era">${escapeHtml(yearLabel)}${noteHtml}</p>
@@ -79,10 +112,10 @@ function eventHtml(e: AwEvent, d: Domain, siteById: Map<string, Site>, mapBase: 
 </li>`;
 }
 
-function axisHtml(d: Domain): string {
+function axisHtml(d: Domain, heightPx: number): string {
   const ticks = axisTicks(d).map((y) => {
-    const f = positionFraction(y, d);
-    return `<li class="tick" style="top:${pct(f)}"><span>${escapeHtml(formatYear(y))}</span></li>`;
+    const top = positionFraction(y, d) * heightPx;
+    return `<li class="tick" style="top:${px(top)}"><span>${escapeHtml(formatYear(y))}</span></li>`;
   });
   return `<ol class="axis" aria-hidden="true">${ticks.join("")}</ol>`;
 }
@@ -95,14 +128,28 @@ export function renderTimelineHtml(
   const shown = shownEvents(events);
   const hidden = events.length - shown.length;
   const years = events.flatMap((e) =>
-    e.era_end === null ? [e.era_start] : [e.era_start, e.era_end],
+    e.era_start === null ? [] : e.era_end === null ? [e.era_start] : [e.era_start, e.era_end],
   );
   const domain = computeDomain(years, opts.currentYear);
   const pxPerYear = opts.pxPerYear ?? 0.6;
   const heightPx = Math.max(1200, Math.round((domain.max - domain.min) * pxPerYear));
   const siteById = new Map(sites.map((s) => [s.id, s]));
 
-  const eventsHtml = shown.map((e) => eventHtml(e, domain, siteById, opts.mapBase)).join("\n");
+  // 真の位置(px)と見積り高さから、重ならない実際の top(px) を決める。
+  const trueTops = shown.map((e) => positionFraction(e.era_start ?? 0, domain) * heightPx);
+  const layoutItems = shown.map((e, i) => ({
+    trueTop: trueTops[i]!,
+    height: estimateCardHeight(e, e.site_ids.length),
+  }));
+  const tops = resolveCollisions(layoutItems, COLLISION_GAP);
+
+  const lastBottom =
+    tops.length > 0 ? tops[tops.length - 1]! + layoutItems[tops.length - 1]!.height : 0;
+  const containerHeight = Math.max(heightPx, Math.round(lastBottom + 16));
+
+  const eventsHtml = shown
+    .map((e, i) => eventHtml(e, domain, heightPx, tops[i]!, trueTops[i]!, siteById, opts.mapBase))
+    .join("\n");
 
   const emptyNote =
     shown.length === 0
@@ -132,8 +179,8 @@ export function renderTimelineHtml(
   ${hiddenNote}
 </header>
 <div class="readout" data-year-readout aria-live="polite"><span class="readout-label">表示中の年代</span><span class="readout-year">${escapeHtml(formatYear(domain.min))}</span></div>
-<main class="timeline" style="height:${heightPx}px">
-  ${axisHtml(domain)}
+<main class="timeline" style="height:${px(containerHeight)}" data-height="${heightPx}">
+  ${axisHtml(domain, heightPx)}
   <ol class="events">
 ${eventsHtml}
   </ol>

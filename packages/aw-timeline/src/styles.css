@@ -130,6 +130,25 @@ body {
   background: var(--accent);
   opacity: 0.5;
 }
+/* 衝突回避で下にずれたカードから、真の年代位置へ引き出す線。上端に位置の点を打つ。 */
+.event .leader {
+  position: absolute;
+  left: -1.5rem;
+  width: 2px;
+  background: var(--accent);
+  opacity: 0.4;
+}
+.event .leader::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.9;
+}
 .card {
   background: #fff;
   border: 1px solid var(--line);

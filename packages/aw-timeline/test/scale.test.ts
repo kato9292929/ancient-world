@@ -8,6 +8,7 @@ import {
   eventBand,
   mapSiteUrl,
   axisTicks,
+  resolveCollisions,
   DEFAULT_MIN_YEAR,
 } from "../src/scale.js";
 import type { AwEvent } from "@aw/data";
@@ -114,6 +115,42 @@ describe("mapSiteUrl", () => {
   });
   it("は base が / でも二重スラッシュにしない", () => {
     expect(mapSiteUrl("eridu", "/")).toBe("/?site=eridu");
+  });
+});
+
+describe("resolveCollisions", () => {
+  it("は離れているカードは真の位置のまま", () => {
+    const tops = resolveCollisions(
+      [
+        { trueTop: 100, height: 80 },
+        { trueTop: 400, height: 80 },
+      ],
+      14,
+    );
+    expect(tops).toEqual([100, 400]);
+  });
+  it("は重なるカードを最小間隔で下げる", () => {
+    // 100 + 80 + 14 = 194 > 120 なので 2 つ目は 194 に押し下げる。
+    const tops = resolveCollisions(
+      [
+        { trueTop: 100, height: 80 },
+        { trueTop: 120, height: 80 },
+      ],
+      14,
+    );
+    expect(tops[0]).toBe(100);
+    expect(tops[1]).toBe(194);
+  });
+  it("は押し下げが連鎖する", () => {
+    const tops = resolveCollisions(
+      [
+        { trueTop: 0, height: 50 },
+        { trueTop: 10, height: 50 },
+        { trueTop: 20, height: 50 },
+      ],
+      10,
+    );
+    expect(tops).toEqual([0, 60, 120]);
   });
 });
 
