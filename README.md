@@ -14,6 +14,7 @@ packages/
   aw-objects    遺物の3Dビューア                                  ※ aw-data を参照
   aw-compare    比較スライダー（2状態の切り替え）
   aw-lp         ancient world のトップページ（モーションのLP）    ※ aw-data の実データ由来の形状
+  aw-study      古代史研究者の書斎（Blender のシーン。Python/bpy） ※ aw-data の名前と各ビジュアルのスクショを使う
 ```
 
 現時点で立っているもの:
@@ -23,6 +24,8 @@ packages/
 - **`aw-map`** — 遺跡年代マップ。同梱の Natural Earth 地形（外部タイル非依存）に、年代スライダーとクラスタ一覧・詳細パネル。座標が全件 null でも「一覧 38・ピン 0・所在未特定 1」で起動する
 - **`aw-objects`** — 遺物の3Dビューア（Weld-Blundell Prism）。寸法から形状をコード生成した模型。刻文は再現せず、WebGL 非対応時は模式図にフォールバック
 - **`aw-lp`** — トップページ。クラスタ件数を点の密度で示すデータ由来のモーション（CSS/SVG のみ、画像0）と、3つの入口・記事一覧。JS 無効でも読める
+
+- **`aw-study`** — Blender の練習。書斎のシーンを `bpy` のコードだけで生成し、Cycles（CPU）で静止画と動画を描く。pnpm のワークスペース外（`package.json` を持たない）で、CI の対象にも入らない。手順は [`packages/aw-study/README.md`](packages/aw-study/README.md)
 
 残るは `aw-compare`（比較スライダー）のみ。題材が未確定のため着手前に判断が要る。
 
