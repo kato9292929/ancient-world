@@ -27,7 +27,7 @@ packages/
 - **`aw-lp`** — トップページ。クラスタ件数を点の密度で示すデータ由来のモーション（CSS/SVG のみ、画像0）と、3つの入口・記事一覧。JS 無効でも読める
 
 - **`aw-study`** — Blender の練習。書斎のシーンを `bpy` のコードだけで生成し、Cycles（CPU）で静止画と動画を描く。pnpm のワークスペース外（`package.json` を持たない）で、CI の対象にも入らない。手順は [`packages/aw-study/README.md`](packages/aw-study/README.md)
-- **`aw-world`** — 古代世界の場面を Blender で描く。第一の場面はギョベクリ・テペ（第III層）の復元イメージ。わかっていることと推測で埋めたものを README で分けている。`aw-study` と同じく pnpm・CI の対象外。手順は [`packages/aw-world/README.md`](packages/aw-world/README.md)
+- **`aw-world`** — 古代世界の場面を Blender で描く。第一の場面はギョベクリ・テペ（第III層）の復元イメージ、第二の場面はアトランティス（『クリティアス』による想像図。DXF 図面と音つき動画）。わかっていることと推測で埋めたものを README で分けている。`aw-study` と同じく pnpm・CI の対象外。手順は [`packages/aw-world/README.md`](packages/aw-world/README.md)
 
 残るは `aw-compare`（比較スライダー）のみ。題材が未確定のため着手前に判断が要る。
 
